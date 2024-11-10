@@ -1,0 +1,144 @@
+---
+
+---
+
+<div class="container">
+  <div class="form-container">
+    <h1>Ingresar Datos</h1>
+    <form>
+      <!-- <label for="id">ID:</label>
+      <input type="number" name="id" id="id" required /> -->
+
+      <label for="siteName">Nombre del sitio:</label>
+      <input type="text" name="siteName" id="siteName" required />
+
+      <label for="userName">Nombre de usuario:</label>
+      <input type="text" name="userName" id="userName" required />
+
+      <label for="encryptedpassword">Password</label>
+      <input
+        type="text"
+        name="encryptedpassword"
+        id="encryptedpassword"
+        required
+      />
+
+      <label for="note">Nota:</label>
+      <textarea name="note" id="note" rows="3"></textarea>
+
+      <label for="url">URL:</label>
+      <input type="url" name="url" id="url" />
+
+      <label for="securityStatus">Estado de seguridad:</label>
+      <input type="text" name="securityStatus" id="securityStatus" required />
+
+      <button type="submit" class="newButton">Enviar</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const addButton = document.querySelector(".newButton");
+
+    addButton.addEventListener("click", async () => {
+      const datajson = {
+        // id: (document.getElementById("id") as HTMLInputElement).value,
+        siteName: (document.getElementById("siteName") as HTMLInputElement)
+          .value,
+        userName: (document.getElementById("userName") as HTMLInputElement)
+          .value,
+        encryptedpassword: (
+          document.getElementById("encryptedpassword") as HTMLInputElement
+        ).value,
+        note: (document.getElementById("note") as HTMLTextAreaElement).value,
+        url: (document.getElementById("url") as HTMLInputElement).value,
+        createDate: new Date().toISOString(), // Crea la fecha actual en formato ISO
+        updateDate: new Date().toISOString(),
+        securityStatus: (
+          document.getElementById("securityStatus") as HTMLInputElement
+        ).value,
+      };
+
+      const responseData = await fetch(
+        "http://localhost:5071/api/PasswordEntries",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(datajson),
+        }
+      )
+        .then((response) => response.json())
+        .then((result) => console.log(result))
+        .catch((error) => console.log("error", error));
+    });
+  });
+</script>
+
+<style>
+  /* Estilos básicos para centrar el formulario */
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #202020;
+    color: white;
+    font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+      "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 40%;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #404040;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: white;
+  }
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-top: 1rem;
+    color: white;
+  }
+
+  input,
+  textarea,
+  button {
+    width: 93%;
+    padding: 0.8rem;
+    margin-top: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  button {
+    margin-top: 1.5rem;
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>

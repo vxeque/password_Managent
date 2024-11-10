@@ -1,0 +1,225 @@
+---
+import { GET, GETID } from "../../pages/api.ts";
+
+const urlApiUpdate = import.meta.env.PUBLIC_URL;
+console.log(urlApiUpdate);
+
+export async function getStaticPaths() {
+  //llamar por el metodo get
+  const response = await GET(Astro);
+  const data = await response.json();
+
+  return data.externalData.map((post) => {
+    return {
+      params: { id: post.id },
+    };
+  });
+}
+
+const { id } = Astro.params;
+
+// const response = await fetch(`http://localhost:5071/api/PasswordEntries/${id}`);
+const response = await fetch(`${urlApiUpdate}${id}`);
+const data = await response.json();
+---
+
+<div class="container">
+  <div class="form-container">
+    <h1>Actualizar Datos</h1>
+    <form id="formulario">
+      <span id="idData">{data.id}</span>
+
+      <label for="siteName">Nombre del sitio:</label>
+      <input
+        type="text"
+        name="siteName"
+        id="siteName"
+        required
+        value=`${data.siteName}`
+      />
+
+      <label for="userName">Nombre de usuario:</label>
+      <input
+        type="text"
+        name="userName"
+        id="userName"
+        required
+        value=`${data.userName}`
+      />
+
+      <label for="encryptedpassword">Password</label>
+      <input
+        type="password"
+        name="encryptedpassword"
+        id="encryptedpassword"
+        required
+        value=`${data.encryptedpassword}`
+      />
+
+      <label for="note">Nota:</label>
+      <textarea name="note" id="note" rows="3" value=`${data.note}`></textarea>
+
+      <label for="url">URL:</label>
+      <input type="url" name="url" id="url" value=`${data.url}` />
+
+      <label for="securityStatus">Estado de seguridad:</label>
+      <input
+        type="text"
+        name="securityStatus"
+        id="securityStatus"
+        required
+        value=`${data.securityStatus}`
+      />
+
+      <button type="submit" class="updateButton">Actualizar</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document
+    .getElementById("formulario")
+    .addEventListener("submit", async (e) => {
+
+      const urlApiUpdate = import.meta.env.PUBLIC_URL
+
+      e.preventDefault();
+
+      // Obtener el ID y convertirlo a número
+      const idElement = document.querySelector("#idData") as HTMLElement;
+      const idNumber = parseInt(idElement.textContent || "0", 10);
+
+      // Crear el objeto con el formato exacto que espera el servidor
+      const datajson = {
+        id: idNumber, // Aseguramos que sea número
+        siteName:
+          (document.getElementById("siteName") as HTMLInputElement).value ||
+          "string",
+        userName:
+          (document.getElementById("userName") as HTMLInputElement).value ||
+          "string",
+        encryptedpassword:
+          (document.getElementById("encryptedpassword") as HTMLInputElement)
+            .value || "string",
+        note:
+          (document.getElementById("note") as HTMLTextAreaElement).value ||
+          "string",
+        url:
+          (document.getElementById("url") as HTMLInputElement).value ||
+          "string",
+        createDate: new Date().toISOString(),
+        updateDate: new Date().toISOString(),
+        securityStatus:
+          (document.getElementById("securityStatus") as HTMLInputElement)
+            .value || "string",
+      };
+
+      console.log("Datos a enviar:", datajson);
+
+      try {
+        const responseUpdateElement = await fetch(
+          // `http://localhost:5071/api/PasswordEntries/${idNumber}`,
+          `${urlApiUpdate}${idNumber}`,
+          {
+            method: "PUT",
+            headers: {
+              accept: "*/*",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(datajson),
+          }
+        );
+
+        // Primero obtener el texto de la respuesta
+        const responseText = await responseUpdateElement.text();
+        // console.log("Respuesta del servidor:", responseText);
+
+        if (!responseUpdateElement.ok) {
+          throw new Error(
+            `Error del servidor: ${responseUpdateElement.status} - ${responseText}`
+          );
+        }
+
+        // Solo intentar parsear como JSON si hay contenido
+        // if (responseText) {
+        //   const data = JSON.parse(responseText);
+        //   console.log("Actualización exitosa:", data);
+        // }
+
+        // // Si llegamos aquí, todo salió bien
+        // alert("Datos actualizados correctamente");
+        window.location.href = "/";
+      } catch (error) {
+        console.error("Error completo:", error);
+        alert(
+          "Error al actualizar los datos. Por favor, verifica la información."
+        );
+      }
+    });
+</script>
+
+<style>
+  /* Estilos básicos para centrar el formulario */
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #202020;
+    color: white;
+    font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+      "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 40%;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #404040;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: white;
+  }
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-top: 1rem;
+    color: white;
+  }
+
+  input,
+  textarea,
+  button {
+    width: 93%;
+    padding: 0.8rem;
+    margin-top: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  button {
+    margin-top: 1.5rem;
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
